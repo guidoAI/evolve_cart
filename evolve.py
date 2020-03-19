@@ -37,7 +37,7 @@ class CTRNN_agent(object):
             weights = np.reshape(w, [self.network_size, self.network_size])
             biases = weight_range * (2.0 * (genome[ind:ind+self.network_size] - 0.5))
             ind += self.network_size
-            taus = genome[ind:ind+self.network_size] + 1e-5
+            taus = 0.9 * genome[ind:ind+self.network_size] + 0.05
             ind += self.network_size
             gains = 2.0 * (genome[ind:ind+self.network_size]-0.5)
         
@@ -58,11 +58,11 @@ class CTRNN_agent(object):
         output = 2.0 * (self.cns.outputs[-self.n_actions:] - 0.5)
         return output
 
-def evaluate(genome, seed = 0):
+def evaluate(genome, seed = 0, graphics = False):
     # create the phenotype from the genotype:
     agent = CTRNN_agent(n_neurons, genome=genome)
     # run the agent:
-    reward = run_cart.run_cart_continuous(agent, simulation_seed=seed, graphics=False)
+    reward = run_cart.run_cart_continuous(agent, simulation_seed=seed, graphics=graphics)
     #print('Reward = ' + str(reward))
     return reward
     
@@ -113,3 +113,31 @@ print('Genome = ' + str(Best))
 plt.figure();
 plt.plot(range(n_generations), mean_fitness)
 plt.plot(range(n_generations), max_fitness)
+plt.xlabel('Generations')
+plt.ylabel('Fitness')
+plt.legend(['Mean fitness', 'Max fitness'])
+
+evaluate(Best, graphics=True)
+
+# [0.45171336 0.56884579 0.56491725 0.52454626 0.62193989 0.93614712
+# 0.11661162 0.85653936 0.8252461  0.58089882 0.49492735 0.29667685
+# 0.37451896 0.28677048 0.58993811 0.40936107 0.58782825 0.80730997
+# 0.01144499 0.24997571 0.96522433 0.43802989 0.85582822 0.68161953
+# 0.09922401 0.00944109 0.48865537 0.67333867 0.46357003 0.13809677
+# 0.61378884 0.01584258 0.40355504 0.91482147 0.104826   0.08818507
+# 0.19016941 0.66526232 0.63112008 0.05886177 0.92747044 0.15039487
+# 0.90581753 0.40119454 0.1405474  0.59073871 0.61410107 0.59311201
+# 0.08417983 0.56294264 0.1569458  0.51982971 0.92425958 0.78642168
+# 0.16405216 0.41192316 0.47124697 0.00402501 0.31529679 0.3304696
+# 0.79951395 0.61514499 0.23998659 0.75974331 0.74741824 0.05070599
+# 0.81349603 0.17996044 0.78620247 0.57800292 0.26622618 0.88572737
+# 0.15759135 0.32968242 0.29482816 0.8173645  0.10642025 0.28714128
+# 0.90271657 0.12750287 0.80017311 0.14303477 0.39791978 0.06028407
+# 0.30904659 0.19234539 0.40238758 0.77492678 0.19980607 0.40104742
+# 0.03819147 0.60142126 0.49926754 0.9275328  0.24308627 0.76369425
+# 0.11618019 0.54042436 0.11330077 0.50906504 0.46958862 0.58632169
+# 0.36078934 0.22232279 0.21377307 0.50852865 0.03993209 0.99276823
+# 0.04907156 0.96038988 0.6755306  0.35899863 0.36131098 0.05907509
+# 0.11244481 0.24913528 0.99368481 0.92319233 0.5096662  0.972418
+# 0.29104816 0.04881569 0.92633616 0.85156212 0.62426413 0.68661007
+# 0.93283555 0.68723513 0.79902284 0.49577034]
