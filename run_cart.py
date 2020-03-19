@@ -27,11 +27,24 @@ class CTRNN_agent(object):
     n_observations = 2;
     n_actions = 1;
     
-    def __init__(self, network_size, weights=[], taus = [], gains = [], biases = []):
+    def __init__(self, network_size, genome = [], weights=[], taus = [], gains = [], biases = []):
+        
         self.network_size = network_size;
         if(self.network_size < self.n_observations + self.n_actions):
             self.network_size = self.n_observations + self.n_actions;
         self.cns = CTRNN(self.network_size, step_size=0.1) 
+        
+        if(len(genome) == self.network_size*self.network_size+3*self.network_size):
+            # Get the network parameters from the genome:
+            ind = self.network_size*self.network_size
+            w = genome[:ind]
+            weights = np.reshape(w, [self.network_size, self.network_size])
+            biases = genome[ind:ind+self.network_size]
+            ind += self.network_size
+            taus = genome[ind:ind+self.network_size]
+            ind += self.network_size
+            gains = genome[ind:ind+self.network_size]
+        
         if(len(weights) > 0):
             # weights must be a matrix size: network_size x network_size
             self.cns.weights = csr_matrix(weights)
@@ -46,7 +59,8 @@ class CTRNN_agent(object):
         external_inputs = np.asarray([0.0]*self.network_size)
         external_inputs[0:self.n_observations] = observation
         self.cns.euler_step(external_inputs)
-        return self.cns.outputs[-self.n_actions:]
+        output = 2.0 * (self.cns.outputs[-self.n_actions:] - 0.5)
+        return output
 
 class CMC(cc.Continuous_MountainCarEnv):
     """ Derived class of Continuous Mountain Car, so that we can change, e.g., the reward function.
