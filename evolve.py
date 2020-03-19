@@ -77,6 +77,7 @@ n_generations = 30
 p_mut = 0.05
 n_best = 3
 
+np.random.seed(6) # 0-5 do not work
 Population = np.random.rand(n_individuals, genome_size)
 Reward = np.zeros([n_individuals,])
 max_fitness = np.zeros([n_generations,])
