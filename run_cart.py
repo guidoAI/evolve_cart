@@ -69,6 +69,14 @@ class CMC(cc.Continuous_MountainCarEnv):
     
     def __init__(self):
         super(CMC, self).__init__()
+        self.max_distance = self.max_position - self.min_position
+        self.min_distance = self.max_distance
+    
+    def reset(self):
+        super(CMC, self).reset()
+        self.max_distance = self.max_position - self.min_position
+        self.min_distance = self.max_distance
+        return np.array(self.state)
     
     def step(self, action):
 
@@ -87,10 +95,15 @@ class CMC(cc.Continuous_MountainCarEnv):
         done = bool(position >= self.goal_position and velocity >= self.goal_velocity)
 
         # Now you can change the reward function here:
+        distance = abs(position - self.goal_position)
+        if(distance < self.min_distance):
+            self.min_distance = distance
+            
         reward = 0
-        #if done:
-        #    reward = 100.0
-        #reward-= math.pow(action[0],2)*0.1
+        if done:
+            reward = 100.0
+        reward -= math.pow(action[0],2)*0.1
+        reward += 1. - self.min_distance / self.max_distance
 
         self.state = np.array([position, velocity])
         return self.state, reward, done, {}

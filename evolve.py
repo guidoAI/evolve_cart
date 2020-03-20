@@ -58,14 +58,27 @@ class CTRNN_agent(object):
         output = 2.0 * (self.cns.outputs[-self.n_actions:] - 0.5)
         return output
 
-def evaluate(genome, seed = 0, graphics = False):
+def evaluate(genome, seed = 0, graphics = False, original_reward=True):
     # create the phenotype from the genotype:
     agent = CTRNN_agent(n_neurons, genome=genome)
     # run the agent:
-    reward = run_cart.run_cart_continuous(agent, simulation_seed=seed, graphics=graphics)
+    if(original_reward):
+        reward = run_cart.run_cart_continuous(agent, simulation_seed=seed, graphics=graphics)
+    else:
+        reward = run_cart.run_cart_continuous(agent, env=run_cart.CMC(), simulation_seed=seed, graphics=graphics)
     #print('Reward = ' + str(reward))
     return reward
+
+def test_best(Best, original_reward=True):    
+    n_tests = 30
+    fit = np.zeros([n_tests,])
+    for t in range(n_tests):
+        fit[t] = evaluate(Best, seed = 100+t, graphics=False, original_reward=True)
     
+    plt.figure()
+    plt.boxplot(fit)
+    plt.ylabel('Fitness')
+    plt.xticks([1], ['Fitness best individual'])
     
 # Parameters CTRNN:
 network_size = 10
@@ -77,7 +90,8 @@ n_generations = 30
 p_mut = 0.05
 n_best = 3
 
-np.random.seed(6) # 0-5 do not work
+np.random.seed(0) # 0-5 do not work
+original_reward = False
 Population = np.random.rand(n_individuals, genome_size)
 Reward = np.zeros([n_individuals,])
 max_fitness = np.zeros([n_generations,])
@@ -88,7 +102,7 @@ for g in range(n_generations):
     
     # evaluate:
     for i in range(n_individuals):
-        Reward[i] = evaluate(Population[i, :])
+        Reward[i] = evaluate(Population[i, :], original_reward=original_reward)
     mean_fitness[g] = np.mean(Reward)
     max_fitness[g] = np.max(Reward)
     print('Generation {}, mean = {} max = {}'.format(g, mean_fitness[g], max_fitness[g]))
@@ -109,7 +123,14 @@ for g in range(n_generations):
     Population = NewPopulation
 
 print('Best fitness ' + str(fitness_best))
-print('Genome = ' + str(Best))
+print('Genome = ')
+for gene in range(len(Best)):
+    if(gene == 0):
+        print('[' + str(Best[gene]) + ', ', end='');
+    elif(gene == len(Best)-1):
+        print(str(Best[gene]) + ']');
+    else:
+        print(str(Best[gene]) + ', ', end='');
 
 plt.figure();
 plt.plot(range(n_generations), mean_fitness)
@@ -119,6 +140,7 @@ plt.ylabel('Fitness')
 plt.legend(['Mean fitness', 'Max fitness'])
 
 evaluate(Best, graphics=True)
+test_best(Best)
 
 # [0.45171336 0.56884579 0.56491725 0.52454626 0.62193989 0.93614712
 # 0.11661162 0.85653936 0.8252461  0.58089882 0.49492735 0.29667685
