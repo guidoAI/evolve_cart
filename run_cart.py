@@ -13,6 +13,8 @@ import numpy as np
 import gym.envs.classic_control as cc
 from CTRNN import CTRNN
 from scipy.sparse import csr_matrix
+from matplotlib import pyplot as plt
+import time
 
 class random_agent(object):
     """Random agent"""
@@ -68,14 +70,19 @@ class CMC(cc.Continuous_MountainCarEnv):
     # Based on: https://raw.githubusercontent.com/openai/gym/master/gym/envs/classic_control/continuous_mountain_car.py
     
     def __init__(self):
+        self.figure_handle = []
         super(CMC, self).__init__()
         self.max_distance = self.max_position - self.min_position
         self.min_distance = self.max_distance
+    
     
     def reset(self):
         super(CMC, self).reset()
         self.max_distance = self.max_position - self.min_position
         self.min_distance = self.max_distance
+        if(self.figure_handle != []):
+            plt.close('mountain_car')
+            self.figure_handle = []
         return np.array(self.state)
     
     def step(self, action):
@@ -108,6 +115,31 @@ class CMC(cc.Continuous_MountainCarEnv):
         self.state = np.array([position, velocity])
         return self.state, reward, done, {}
 
+    def render(self, mode='human'):
+        
+        # first plot the landscape:
+        step = 0.01
+        x_coords = np.arange(self.min_position, self.max_position, step)
+        y_coords = self._height(x_coords)
+        
+        if(self.figure_handle == []):
+            self.figure_handle = plt.figure('mountain_car')
+            self.ax = self.figure_handle.add_subplot(111)
+            plt.ion()
+            #self.figure_handle.show()
+            self.figure_handle.canvas.draw()
+        else:
+            plt.figure('mountain_car')
+        
+        self.ax.clear()
+        self.ax.plot(x_coords, y_coords)
+        self.ax.plot(self.state[0], self._height(self.state[0]), 'rx')
+        self.figure_handle.canvas.draw()
+        self.figure_handle.show()
+        #time.sleep(0.1)
+        
+        
+        
 
 def run_cart_continuous(agent, simulation_seed=0, n_episodes=1, env=cc.Continuous_MountainCarEnv(), max_steps = 1000, graphics=False):
     """ Runs the continous cart problem, with the agent mapping observations to actions 
@@ -151,4 +183,4 @@ if __name__ == '__main__':
     gains = np.ones([n_neurons,])
     biases = np.zeros([n_neurons,])
     agent = CTRNN_agent(n_neurons, weights=weights, taus = taus, gains = gains, biases = biases)
-    reward = run_cart_continuous(agent, graphics=True)
+    reward = run_cart_continuous(agent, env=CMC(), graphics=True)
