@@ -17,6 +17,7 @@ from matplotlib import pyplot as plt
 import time
 from IPython import display
 import os
+from gym.utils import seeding
 
 class random_agent(object):
     """Random agent"""
@@ -66,20 +67,70 @@ class CTRNN_agent(object):
         output = 2.0 * (self.cns.outputs[-self.n_actions:] - 0.5)
         return output
 
-class CMC(cc.Continuous_MountainCarEnv):
+class CMC_original(cc.Continuous_MountainCarEnv):
+    """ Derived class of Continuous Mountain Car, just modified the rendering function.
+    """
+    # Based on: https://raw.githubusercontent.com/openai/gym/master/gym/envs/classic_control/continuous_mountain_car.py
+
+    def __init__(self):
+        super(CMC_original, self).__init__()
+    
+    def reset(self):
+        super(CMC_original, self).reset()
+
+    def render(self, mode='human', sleep_time=0.033):
+        
+        if os.name == 'nt':
+            normal_display = True
+        else:
+            if 'DISPLAY' in os.environ.keys():
+                normal_display = True
+            else:
+                normal_display = False
+            
+        if normal_display:
+            super(CMC_original, self).render()
+        else:
+            
+            # first plot the landscape:
+            step = 0.01
+            x_coords = np.arange(self.min_position, self.max_position, step)
+            y_coords = self._height(x_coords)
+            
+            if(self.figure_handle == []):
+                self.figure_handle = plt.figure('mountain_car')
+                self.ax = self.figure_handle.add_subplot(111)
+                plt.ion()
+                #self.figure_handle.show()
+                self.figure_handle.canvas.draw()
+            else:
+                plt.figure('mountain_car')
+            
+            self.ax.clear()
+            self.ax.plot(x_coords, y_coords)
+            self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
+            self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
+            #        self.figure_handle.canvas.draw()
+            #        self.figure_handle.show()
+            display.clear_output(wait=True)
+            display.display(plt.gcf())
+            time.sleep(sleep_time)
+    
+
+class CMC_adapted(cc.Continuous_MountainCarEnv):
     """ Derived class of Continuous Mountain Car, so that we can change, e.g., the reward function.
     """
     # Based on: https://raw.githubusercontent.com/openai/gym/master/gym/envs/classic_control/continuous_mountain_car.py
     
     def __init__(self):
         self.figure_handle = []
-        super(CMC, self).__init__()
+        super(CMC_adapted, self).__init__()
         self.max_distance = self.max_position - self.min_position
         self.min_distance = self.max_distance
     
     
     def reset(self):
-        super(CMC, self).reset()
+        super(CMC_adapted, self).reset()
         self.max_distance = self.max_position - self.min_position
         self.min_distance = self.max_distance
         if(self.figure_handle != []):
@@ -128,7 +179,7 @@ class CMC(cc.Continuous_MountainCarEnv):
                 normal_display = False
             
         if normal_display:
-            super(CMC, self).render()
+            super(CMC_adapted, self).render()
         else:
             
             # first plot the landscape:
@@ -154,9 +205,6 @@ class CMC(cc.Continuous_MountainCarEnv):
             display.clear_output(wait=True)
             display.display(plt.gcf())
             time.sleep(sleep_time)
-            
-        
-        
 
 def run_cart_continuous(agent, simulation_seed=0, n_episodes=1, env=cc.Continuous_MountainCarEnv(), max_steps = 1000, graphics=False):
     """ Runs the continous cart problem, with the agent mapping observations to actions 
@@ -200,4 +248,4 @@ if __name__ == '__main__':
     gains = np.ones([n_neurons,])
     biases = np.zeros([n_neurons,])
     agent = CTRNN_agent(n_neurons, weights=weights, taus = taus, gains = gains, biases = biases)
-    reward = run_cart_continuous(agent, env=CMC(), graphics=True)
+    reward = run_cart_continuous(agent, simulation_seed=0, env=CMC_original(), graphics=True)
