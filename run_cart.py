@@ -134,7 +134,8 @@ class CMC(cc.Continuous_MountainCarEnv):
         
         self.ax.clear()
         self.ax.plot(x_coords, y_coords)
-        self.ax.plot(self.state[0], self._height(self.state[0]), 'rx')
+        self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
+        self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
         #        self.figure_handle.canvas.draw()
         #        self.figure_handle.show()
         display.clear_output(wait=True)
