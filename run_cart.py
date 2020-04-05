@@ -15,6 +15,7 @@ from CTRNN import CTRNN
 from scipy.sparse import csr_matrix
 from matplotlib import pyplot as plt
 import time
+from IPython import display
 
 class random_agent(object):
     """Random agent"""
@@ -115,7 +116,7 @@ class CMC(cc.Continuous_MountainCarEnv):
         self.state = np.array([position, velocity])
         return self.state, reward, done, {}
 
-    def render(self, mode='human'):
+    def render(self, mode='human', sleep_time=0.033):
         
         # first plot the landscape:
         step = 0.01
@@ -134,9 +135,11 @@ class CMC(cc.Continuous_MountainCarEnv):
         self.ax.clear()
         self.ax.plot(x_coords, y_coords)
         self.ax.plot(self.state[0], self._height(self.state[0]), 'rx')
-        self.figure_handle.canvas.draw()
-        self.figure_handle.show()
-        #time.sleep(0.1)
+        #        self.figure_handle.canvas.draw()
+        #        self.figure_handle.show()
+        display.clear_output(wait=True)
+        display.display(plt.gcf())
+        time.sleep(sleep_time)
         
         
         
