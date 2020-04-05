@@ -16,6 +16,7 @@ from scipy.sparse import csr_matrix
 from matplotlib import pyplot as plt
 import time
 from IPython import display
+import os
 
 class random_agent(object):
     """Random agent"""
@@ -118,30 +119,42 @@ class CMC(cc.Continuous_MountainCarEnv):
 
     def render(self, mode='human', sleep_time=0.033):
         
-        # first plot the landscape:
-        step = 0.01
-        x_coords = np.arange(self.min_position, self.max_position, step)
-        y_coords = self._height(x_coords)
-        
-        if(self.figure_handle == []):
-            self.figure_handle = plt.figure('mountain_car')
-            self.ax = self.figure_handle.add_subplot(111)
-            plt.ion()
-            #self.figure_handle.show()
-            self.figure_handle.canvas.draw()
+        if os.name == 'nt':
+            normal_display = True
         else:
-            plt.figure('mountain_car')
-        
-        self.ax.clear()
-        self.ax.plot(x_coords, y_coords)
-        self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
-        self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
-        #        self.figure_handle.canvas.draw()
-        #        self.figure_handle.show()
-        display.clear_output(wait=True)
-        display.display(plt.gcf())
-        time.sleep(sleep_time)
-        
+            if 'DISPLAY' in os.environ.keys():
+                normal_display = True
+            else:
+                normal_display = False
+            
+        if normal_display:
+            super(CMC, self).render()
+        else:
+            
+            # first plot the landscape:
+            step = 0.01
+            x_coords = np.arange(self.min_position, self.max_position, step)
+            y_coords = self._height(x_coords)
+            
+            if(self.figure_handle == []):
+                self.figure_handle = plt.figure('mountain_car')
+                self.ax = self.figure_handle.add_subplot(111)
+                plt.ion()
+                #self.figure_handle.show()
+                self.figure_handle.canvas.draw()
+            else:
+                plt.figure('mountain_car')
+            
+            self.ax.clear()
+            self.ax.plot(x_coords, y_coords)
+            self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
+            self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
+            #        self.figure_handle.canvas.draw()
+            #        self.figure_handle.show()
+            display.clear_output(wait=True)
+            display.display(plt.gcf())
+            time.sleep(sleep_time)
+            
         
         
 
