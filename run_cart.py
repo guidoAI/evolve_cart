@@ -73,10 +73,15 @@ class CMC_original(cc.Continuous_MountainCarEnv):
     # Based on: https://raw.githubusercontent.com/openai/gym/master/gym/envs/classic_control/continuous_mountain_car.py
 
     def __init__(self):
+        self.figure_handle = []
         super(CMC_original, self).__init__()
     
     def reset(self):
         super(CMC_original, self).reset()
+        if(self.figure_handle != []):
+            plt.close('mountain_car')
+            self.figure_handle = []
+        return np.array(self.state)
 
     def render(self, mode='human', sleep_time=0.033):
         
