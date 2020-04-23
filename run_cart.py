@@ -72,11 +72,15 @@ class CMC_original(cc.Continuous_MountainCarEnv):
     """
     # Based on: https://raw.githubusercontent.com/openai/gym/master/gym/envs/classic_control/continuous_mountain_car.py
 
+    n_steps_per_render = 5
+
     def __init__(self):
         self.figure_handle = []
+        self.render_step = 0
         super(CMC_original, self).__init__()
     
     def reset(self):
+        self.render_step = 0
         super(CMC_original, self).reset()
         if(self.figure_handle != []):
             plt.close('mountain_car')
@@ -96,38 +100,42 @@ class CMC_original(cc.Continuous_MountainCarEnv):
         if normal_display:
             super(CMC_original, self).render()
         else:
-            
-            # first plot the landscape:
-            step = 0.01
-            x_coords = np.arange(self.min_position, self.max_position, step)
-            y_coords = self._height(x_coords)
-            
-            if(self.figure_handle == []):
-                self.figure_handle = plt.figure('mountain_car')
-                self.ax = self.figure_handle.add_subplot(111)
-                plt.ion()
-                #self.figure_handle.show()
-                self.figure_handle.canvas.draw()
-            else:
-                plt.figure('mountain_car')
-            
-            self.ax.clear()
-            self.ax.plot(x_coords, y_coords)
-            self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
-            self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
-            #        self.figure_handle.canvas.draw()
-            #        self.figure_handle.show()
-            display.clear_output(wait=True)
-            display.display(plt.gcf())
-            time.sleep(sleep_time)
-    
+            self.render_step += 1
+            if(self.render_step % n_steps_per_render == 0):
+                # first plot the landscape:
+                step = 0.01
+                x_coords = np.arange(self.min_position, self.max_position, step)
+                y_coords = self._height(x_coords)
+                
+                if(self.figure_handle == []):
+                    self.figure_handle = plt.figure('mountain_car')
+                    self.ax = self.figure_handle.add_subplot(111)
+                    plt.ion()
+                    #self.figure_handle.show()
+                    self.figure_handle.canvas.draw()
+                else:
+                    plt.figure('mountain_car')
+                
+                self.ax.clear()
+                self.ax.plot(x_coords, y_coords)
+                self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
+                self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
+                #        self.figure_handle.canvas.draw()
+                #        self.figure_handle.show()
+                display.clear_output(wait=True)
+                display.display(plt.gcf())
+                time.sleep(sleep_time)
+        
 
 class CMC_adapted(cc.Continuous_MountainCarEnv):
     """ Derived class of Continuous Mountain Car, so that we can change, e.g., the reward function.
     """
     # Based on: https://raw.githubusercontent.com/openai/gym/master/gym/envs/classic_control/continuous_mountain_car.py
     
+    n_steps_per_render = 5
+    
     def __init__(self):
+        self.render_step = 0
         self.figure_handle = []
         super(CMC_adapted, self).__init__()
         self.max_distance = self.max_position - self.min_position
@@ -138,6 +146,7 @@ class CMC_adapted(cc.Continuous_MountainCarEnv):
         super(CMC_adapted, self).reset()
         self.max_distance = self.max_position - self.min_position
         self.min_distance = self.max_distance
+        self.render_step = 0
         if(self.figure_handle != []):
             plt.close('mountain_car')
             self.figure_handle = []
@@ -186,30 +195,32 @@ class CMC_adapted(cc.Continuous_MountainCarEnv):
         if normal_display:
             super(CMC_adapted, self).render()
         else:
+            self.render_step += 1
             
-            # first plot the landscape:
-            step = 0.01
-            x_coords = np.arange(self.min_position, self.max_position, step)
-            y_coords = self._height(x_coords)
-            
-            if(self.figure_handle == []):
-                self.figure_handle = plt.figure('mountain_car')
-                self.ax = self.figure_handle.add_subplot(111)
-                plt.ion()
-                #self.figure_handle.show()
-                self.figure_handle.canvas.draw()
-            else:
-                plt.figure('mountain_car')
-            
-            self.ax.clear()
-            self.ax.plot(x_coords, y_coords)
-            self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
-            self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
-            #        self.figure_handle.canvas.draw()
-            #        self.figure_handle.show()
-            display.clear_output(wait=True)
-            display.display(plt.gcf())
-            time.sleep(sleep_time)
+            if(self.render_step % n_steps_per_render == 0):
+                # first plot the landscape:
+                step = 0.01
+                x_coords = np.arange(self.min_position, self.max_position, step)
+                y_coords = self._height(x_coords)
+                
+                if(self.figure_handle == []):
+                    self.figure_handle = plt.figure('mountain_car')
+                    self.ax = self.figure_handle.add_subplot(111)
+                    plt.ion()
+                    #self.figure_handle.show()
+                    self.figure_handle.canvas.draw()
+                else:
+                    plt.figure('mountain_car')
+                
+                self.ax.clear()
+                self.ax.plot(x_coords, y_coords)
+                self.ax.plot(self.state[0], self._height(self.state[0]), 'ro')
+                self.ax.text(self.goal_position, self._height(self.goal_position)+0.02, 'Goal')        
+                #        self.figure_handle.canvas.draw()
+                #        self.figure_handle.show()
+                display.clear_output(wait=True)
+                display.display(plt.gcf())
+                time.sleep(sleep_time)
 
 def run_cart_continuous(agent, simulation_seed=0, n_episodes=1, env=cc.Continuous_MountainCarEnv(), max_steps = 1000, graphics=False):
     """ Runs the continous cart problem, with the agent mapping observations to actions 
