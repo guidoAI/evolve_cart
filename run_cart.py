@@ -101,7 +101,7 @@ class CMC_original(cc.Continuous_MountainCarEnv):
             super(CMC_original, self).render()
         else:
             self.render_step += 1
-            if(self.render_step % n_steps_per_render == 0):
+            if(self.render_step % self.n_steps_per_render == 0):
                 # first plot the landscape:
                 step = 0.01
                 x_coords = np.arange(self.min_position, self.max_position, step)
@@ -197,7 +197,7 @@ class CMC_adapted(cc.Continuous_MountainCarEnv):
         else:
             self.render_step += 1
             
-            if(self.render_step % n_steps_per_render == 0):
+            if(self.render_step % self.n_steps_per_render == 0):
                 # first plot the landscape:
                 step = 0.01
                 x_coords = np.arange(self.min_position, self.max_position, step)
