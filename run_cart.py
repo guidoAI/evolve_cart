@@ -232,7 +232,7 @@ def run_cart_continuous(agent, simulation_seed=0, n_episodes=1, env=cc.Continuou
     """
     
     #gym.make('MountainCarContinuous-v0') # CMC() # cc.Continuous_MountainCarEnv()
-    env.seed(simulation_seed)
+    env.reset() # seed=simulation_seed
 
     reward = 0
     cumulative_reward = 0
