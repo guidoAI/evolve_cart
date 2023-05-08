@@ -9,5 +9,16 @@ The easiest way to install and run the Jupyter notebook locally is to:
 (2) Install the required packages with the help of the requirements.txt file (see, e.g., [here](https://stackoverflow.com/questions/7225900/how-can-i-install-packages-using-pip-according-to-the-requirements-txt-file-from) how to do that).
 (3) Add the environment as a Kernel to Jupyter notebook (see, e.g., [this blog](https://janakiev.com/blog/jupyter-virtual-envs/#add-virtual-environment-to-jupyter-notebook)).
 
+On Windows in the (GIT) command window:
 
+```
+git clone git@github.com:guidoAI/evolve_cart.git
+python -m venv evolve_cart
+cd evolve_cart
+.\Scripts\activate.bat
+pip install -r requirements.txt
+pip install ipykernel
+python -m ipykernel install --user --name=evolve_cart
+jupyter notebook
+```
 
