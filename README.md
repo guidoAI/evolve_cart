@@ -22,3 +22,5 @@ python -m ipykernel install --user --name=evolve_cart
 jupyter notebook
 ```
 
+Then, in the Jupyter notebook, select ``evolve_cart`` as a Kernel.
+
