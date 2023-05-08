@@ -58,14 +58,14 @@ class CTRNN_agent(object):
         output = 2.0 * (self.cns.outputs[-self.n_actions:] - 0.5)
         return output
 
-def evaluate(genome, seed = 0, graphics = False, original_reward=True):
+def evaluate(genome, seed = 0, graphics = False, original_reward=True, n_neurons=10):
     # create the phenotype from the genotype:
     agent = CTRNN_agent(n_neurons, genome=genome)
     # run the agent:
     if(original_reward):
         reward = run_cart.run_cart_continuous(agent, simulation_seed=seed, graphics=graphics)
     else:
-        reward = run_cart.run_cart_continuous(agent, env=run_cart.CMC(), simulation_seed=seed, graphics=graphics)
+        reward = run_cart.run_cart_continuous(agent, env=run_cart.CMC_original(), simulation_seed=seed, graphics=graphics)
     #print('Reward = ' + str(reward))
     return reward
 
