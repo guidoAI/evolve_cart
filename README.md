@@ -19,6 +19,7 @@ cd evolve_cart
 pip install -r requirements.txt
 pip install ipykernel
 python -m ipykernel install --user --name=evolve_cart
+pip install notebook
 jupyter notebook
 ```
 
